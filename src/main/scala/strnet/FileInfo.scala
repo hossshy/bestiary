@@ -36,7 +36,11 @@ class FileInfo(
     imageView.fitHeight = 120
   }
 
-  onMouseClicked = (e: MouseEvent) => Seq(command, file.getPath).!
+  onMouseClicked = (e: MouseEvent) => new Thread() {
+    override def run() {
+      Seq(command, file.getPath).!
+    }
+    }.start()
 
   styleClass.append("thumbnail")
   children.addAll(
