@@ -12,11 +12,10 @@ UI
 
 ## Directories
 F:\bestiary
-./files/*.wmv
+./files/*.wmv,*.jpg
 ./common.conf
 ./hoge.txt
 ./piyo.txt
-./thumbnail/*.jpg
 
 ## Input
 

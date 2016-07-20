@@ -2,52 +2,51 @@ package strnet
 
 import java.io.{ File, FileInputStream }
 import java.util.Properties
-import scala.collection.JavaConversions._
+
 import scalafx.Includes._
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.application.{ JFXApp, Platform }
 import scalafx.scene.Scene
-import scalafx.scene.image.{ Image, ImageView }
-import scalafx.scene.layout.{ BorderPane, HBox }
+import scalafx.scene.image.Image
+import scalafx.scene.control._
+import scalafx.scene.layout._
 import scalafx.stage.WindowEvent
 
 object Gui extends JFXApp {
+  val commonProp = new Properties
+  commonProp.load(new FileInputStream(new File("conf" + File.separator + "common.conf")))
+
+  val dir = new File(commonProp.getProperty("directories.path"))
+  val command = commonProp.getProperty("exec.path")
+
+  val defaultImg = new Image(new File("conf" + File.separator + "no.jpg").toURI().toString)
+
   val rootPane = new BorderPane()
-  val listPane = new HBox()
-  rootPane.setCenter(listPane)
+  val listPane = new FlowPane(10, 10)
+  val scrollPane = new ScrollPane()
+  scrollPane.setContent(listPane)
+  listPane.prefWidth.bind(scrollPane.width)
+  listPane.prefHeight.bind(scrollPane.height)
+  scrollPane.styleClass.append("base")
 
 
-  def makeImageView(img: Image): ImageView = {
-    val imageView = new ImageView(img)
-    if (img.getWidth > 120) {
-      imageView.fitWidth = 120
-    }
-    if (img.getHeight > 180) {
-      imageView.fitHeight = 180
-    }
-    imageView
-  }
+  rootPane.setCenter(scrollPane)
 
-  def scanThumbnails(dir: File): Unit = {
-    val thumbnails = dir.listFiles.filter(f => f.isFile && f.getName.matches(".*\\.jpg"))
-    thumbnails.foreach { f => listPane.children.add(makeImageView(new Image(f.toURI().toString))) }
+  def scanFiles(dir: File): Unit = {
+    val thumbnails = dir.listFiles.filter(f => f.isFile && !f.getName.matches(".*\\.jpg"))
+    thumbnails.foreach { f => listPane.children.add(new FileInfo(f, command, ".jpg", defaultImg)) }
   }
 
   stage = new PrimaryStage {
     title = "Bestiary"
     scene = new Scene(rootPane, 1280, 768) {
+      stylesheets.add("/strnet/main.css")
     }
     onCloseRequest = (we: WindowEvent) => Platform.exit()
   }
 
-  val commonProp = new Properties
-  commonProp.load(new FileInputStream(new File("conf" + File.separator + "common.conf")))
-
-  val dir = new File(commonProp.getProperty("directories-path"))
-  println(dir)
-  println(dir.exists())
-  println(dir.isDirectory())
+  println(dir + ":" + dir.exists())
   if ( dir.exists() && dir.isDirectory() ) {
-    scanThumbnails(dir)
+    scanFiles(dir)
   }
 }

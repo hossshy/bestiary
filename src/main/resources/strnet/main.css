@@ -1,0 +1,13 @@
+.base {
+    -fx-background-color: gray;
+}
+.thumbnail {
+    -fx-background-color: white;
+    -fx-border-color: darkgray;
+    -fx-border-width: 3;
+    -fx-border-radius: 2;
+    -fx-background-radius: 10;
+}
+.thumbnail:hover {
+    -fx-background-color: yellow;
+}
